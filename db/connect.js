@@ -1,12 +1,7 @@
-import mongoose from "mongoose";
+import { mongoose } from "mongoose";
 
-const connectDB = (url) => {
-  return mongoose.connect(url, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-  });
+const connectDB = async (url) => {
+  return mongoose.connect(url);
 };
 
 export { connectDB };
