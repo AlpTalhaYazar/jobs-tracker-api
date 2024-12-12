@@ -19,7 +19,7 @@ const register = async (req, res) => {
   const result = Result.success({ id, username, token });
 
   res.status(StatusCodes.CREATED).json(result);
-}
+};
 
 const login = async (req, res) => {
   const { username, password } = req.body;
