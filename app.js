@@ -1,6 +1,7 @@
 import "dotenv/config";
 import "express-async-errors";
 import express from "express";
+import { connectDB } from "./db/connect.js";
 import { authRoutes } from "./routes/auth.js";
 import { jobRoutes } from "./routes/jobs.js";
 import { notFoundMiddleware } from "./middleware/not-found.js";
@@ -25,11 +26,13 @@ const port = process.env.PORT || 3000;
 
 const start = async () => {
   try {
-    app.listen(port, () =>
-      console.log(`Server is listening on port ${port}...`)
-    );
+    await connectDB(process.env.MONGO_URI)
+      .then(() => console.log("Connected to the database"))
+      .catch((error) => console.error(error));
+
+    app.listen(port, console.log(`Server is running on port ${port}`));
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
