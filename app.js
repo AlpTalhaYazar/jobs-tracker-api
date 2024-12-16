@@ -9,13 +9,13 @@ import { errorHandlerMiddleware } from "./middleware/error-handler.js";
 
 const app = express();
 
+app.use(express.json());
+
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/jobs", jobRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
-
-app.use(express.json());
 
 // routes
 app.get("/", (req, res) => {

@@ -1,6 +1,6 @@
 export class RegisterDto {
-  constructor(username, email, password) {
-    this.username = username;
+  constructor(name, email, password) {
+    this.name = name;
     this.email = email;
     this.password = password;
   }
