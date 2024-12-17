@@ -1,3 +1,5 @@
+import "dotenv/config";
+import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -18,9 +20,13 @@ const userSchema = new mongoose.Schema({
       "Please fill a valid email address",
     ],
   },
-  passwordHash: {
+  password: {
     type: String,
     required: [true, "Password is required"],
+  },
+  passwordSalt: {
+    type: String,
+    required: [true, "Password salt is required"],
   },
   lastLoginAt: {
     type: Date,
@@ -34,6 +40,16 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+userSchema.pre("validate", function (next) {
+  if (this.isNew || this.password) {
+    const saltRounds = parseInt(process.env.SALT_ROUNDS);
+    this.passwordSalt = bcrypt.genSaltSync(saltRounds);
+    this.password = bcrypt.hashSync(this.password, this.passwordSalt);
+  }
+
+  next();
 });
 
 userSchema.pre("save", function (next) {
