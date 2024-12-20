@@ -42,14 +42,12 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre("validate", function (next) {
-  if (this.isNew || this.password) {
-    const saltRounds = parseInt(process.env.SALT_ROUNDS);
-    this.passwordSalt = bcrypt.genSaltSync(saltRounds);
-    this.password = bcrypt.hashSync(this.password, this.passwordSalt);
+userSchema.pre('validate', async function () {
+  if (this.isModified('password')) {
+    const saltRounds = parseInt(process.env.SALT_ROUNDS) || 10;
+    this.passwordSalt = await bcrypt.genSalt(saltRounds);
+    this.password = await bcrypt.hash(this.password, this.passwordSalt);
   }
-
-  next();
 });
 
 userSchema.pre("save", function (next) {
