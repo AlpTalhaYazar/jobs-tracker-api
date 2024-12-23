@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 class AuthService {
   static generateToken(payload) {
     return jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+      expiresIn: process.env.JWT_EXPIRES_IN,
     });
   }
 
