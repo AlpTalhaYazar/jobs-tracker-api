@@ -1,8 +1,7 @@
 import "dotenv/config";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import { User } from "../models/User.js";
 import { Result } from "../utils/Result.js";
+import { AuthService } from "../services/authService.js";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError } from "../errors/index.js";
 import { RegisterDto, LoginDto } from "../dto/auth.dto.js";
@@ -15,23 +14,19 @@ const register = async (req, res) => {
   );
 
   const user = await User.create({
-    name: registerUserDto.name,
-    email: registerUserDto.email,
-    password: registerUserDto.password,
+    ...registerUserDto,
   });
 
-  const token = jwt.sign(
-    { id: user._id, name: user.name, email: user.email },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "1d",
-    }
-  );
-
-  const result = Result.success({
+  const tokenPayload = {
     id: user._id,
     name: user.name,
     email: user.email,
+  };
+
+  const token = AuthService.generateToken(tokenPayload);
+
+  const result = Result.success({
+    ...tokenPayload,
     token,
   });
 
@@ -47,19 +42,23 @@ const login = async (req, res) => {
     throw new BadRequestError("Invalid credentials");
   }
 
-  const isPasswordValid = await bcrypt.compare(
-    loginuserDto.password,
-    user.password
-  );
+  const isPasswordValid = await user.comparePassword(loginuserDto.password);
 
   if (!isPasswordValid) {
     throw new BadRequestError("Invalid credentials");
   }
 
-  const result = Result.success({
+  const tokenPayload = {
     id: user._id,
     name: user.name,
     email: user.email,
+  };
+
+  const token = AuthService.generateToken(tokenPayload);
+
+  const result = Result.success({
+    ...tokenPayload,
+    token,
   });
 
   res.status(StatusCodes.OK).json(result);
