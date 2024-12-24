@@ -4,7 +4,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { OperationResult } from "../utils/OperationResult.js";
 
 const errorHandlerMiddleware = async (err, req, res, next) => {
-  const error = { message: err.message, details: err.errors };
   if (err.name === "ValidationError") {
     const statusCode = err.statusCode || StatusCodes.BAD_REQUEST;
 
