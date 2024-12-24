@@ -1,3 +1,9 @@
+import { StatusCodes } from "http-status-codes";
+import { Job } from "../models/Job.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { JobCreateDto } from "../dto/job.dto.js";
+import { OperationResult } from "../utils/OperationResult.js";
+
 const getAllJobs = async (req, res) => {
   res.send("All Jobs");
 };
@@ -7,7 +13,20 @@ const getJobById = async (req, res) => {
 };
 
 const createJob = async (req, res) => {
-  res.send("Create Job");
+  const jobCreateDto = new JobCreateDto(req.body.company, req.body.position);
+
+  const job = await Job.create({
+    ...jobCreateDto,
+    status: "pending",
+    createdBy: req.user._id,
+    updatedBy: req.user._id,
+  });
+
+  const operationResult = await OperationResult.Success(job);
+
+  const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+
+  res.status(StatusCodes.CREATED).json(apiResponse);
 };
 
 const updateJob = async (req, res) => {
