@@ -1,10 +1,11 @@
 import "dotenv/config";
 import { User } from "../models/User.js";
-import { Result } from "../utils/Result.js";
 import { AuthService } from "../services/authService.js";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError } from "../errors/index.js";
 import { RegisterDto, LoginDto } from "../dto/auth.dto.js";
+import { OperationResult } from "../utils/OperationResult.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
 const register = async (req, res) => {
   const registerUserDto = new RegisterDto(
@@ -25,12 +26,14 @@ const register = async (req, res) => {
 
   const token = AuthService.generateToken(tokenPayload);
 
-  const result = Result.success({
+  const operationResult = await OperationResult.Success({
     ...tokenPayload,
     token,
   });
 
-  res.status(StatusCodes.CREATED).json(result);
+  const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+
+  res.status(StatusCodes.CREATED).json(apiResponse);
 };
 
 const login = async (req, res) => {
@@ -56,12 +59,14 @@ const login = async (req, res) => {
 
   const token = AuthService.generateToken(tokenPayload);
 
-  const result = Result.success({
+  const operationResult = await OperationResult.Success({
     ...tokenPayload,
     token,
   });
 
-  res.status(StatusCodes.OK).json(result);
+  const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+
+  res.status(StatusCodes.OK).json(apiResponse);
 };
 
 export { register, login };
