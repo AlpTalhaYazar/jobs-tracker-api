@@ -21,18 +21,10 @@ const jobSchema = new mongoose.Schema(
       enum: ["interview", "declined", "pending"],
       default: "pending",
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: [true, "CreatedBy is required"],
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
     },
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -42,11 +34,6 @@ const jobSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-jobSchema.pre("save", function (next) {
-  this.updatedAt = Date.now();
-  next();
-});
 
 const Job = mongoose.model("Job", jobSchema);
 
