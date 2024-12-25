@@ -9,7 +9,13 @@ const getAllJobs = async (req, res) => {
 };
 
 const getMyJobs = async (req, res) => {
-  res.send("My Jobs");
+  const jobs = await Job.find({ createdBy: req.user._id });
+
+  const operationResult = await OperationResult.Success(jobs);
+
+  const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+
+  res.status(StatusCodes.OK).json(apiResponse);
 };
 
 const getJobById = async (req, res) => {
