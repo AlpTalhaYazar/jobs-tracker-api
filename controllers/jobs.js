@@ -5,7 +5,13 @@ import { JobCreateDto } from "../dto/job.dto.js";
 import { OperationResult } from "../utils/OperationResult.js";
 
 const getAllJobs = async (req, res) => {
-  res.send("All Jobs");
+  const jobs = await Job.find();
+
+  const operationResult = await OperationResult.Success(jobs);
+
+  const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+
+  res.status(StatusCodes.OK).json(apiResponse);
 };
 
 const getMyJobs = async (req, res) => {
