@@ -25,7 +25,13 @@ const getMyJobs = async (req, res) => {
 };
 
 const getJobById = async (req, res) => {
-  res.send("Single Job ${req.params.id}");
+  const job = await Job.findById(req.params.id);
+
+  const operationResult = await OperationResult.Success(job);
+
+  const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+
+  res.status(StatusCodes.OK).json(apiResponse);
 };
 
 const createJob = async (req, res) => {
