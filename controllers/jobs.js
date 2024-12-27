@@ -101,7 +101,37 @@ const updateJob = async (req, res) => {
 };
 
 const deleteJob = async (req, res) => {
-  res.send("Delete Job ${req.params.id}");
+  const job = await Job.findByIdAndDelete(req.params.id);
+
+  if (!job) {
+    const operationResult = await OperationResult.Error(
+      StatusCodes.NOT_FOUND,
+      "Job not found"
+    );
+
+    const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+
+    res.status(StatusCodes.NOT_FOUND).json(apiResponse);
+  }
+
+  if (job.createdBy !== req.user._id) {
+    const operationResult = await OperationResult.Error(
+      StatusCodes.UNAUTHORIZED,
+      "You are not authorized to delete this job"
+    );
+
+    const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+
+    res.status(StatusCodes.UNAUTHORIZED).json(apiResponse);
+  }
+
+  await job.remove();
+
+  const operationResult = await OperationResult.Success(job);
+
+  const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+
+  res.status(StatusCodes.OK).json(apiResponse);
 };
 
 export { getAllJobs, getMyJobs, getJobById, createJob, updateJob, deleteJob };
