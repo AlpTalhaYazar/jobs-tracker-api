@@ -4,3 +4,11 @@ export class JobCreateDto {
     this.position = position;
   }
 }
+
+export class JobUpdateDto {
+  constructor(company, position, status) {
+    this.company = company;
+    this.position = position;
+    this.status = status;
+  }
+}

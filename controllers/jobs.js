@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { Job } from "../models/Job.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { JobCreateDto } from "../dto/job.dto.js";
+import { JobCreateDto, JobUpdateDto } from "../dto/job.dto.js";
 import { OperationResult } from "../utils/OperationResult.js";
 
 const getAllJobs = async (req, res) => {
@@ -52,7 +52,22 @@ const createJob = async (req, res) => {
 };
 
 const updateJob = async (req, res) => {
-  res.send("Update Job ${req.params.id}");
+  const updateModel = new JobUpdateDto(
+    req.body.company,
+    req.body.position,
+    req.body.status
+  );
+
+  const job = await Job.findByIdAndUpdate(req.params.id, {
+    ...updateModel,
+    updatedBy: req.user._id,
+  });
+
+  const operationResult = await OperationResult.Success(job);
+
+  const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+
+  res.status(StatusCodes.OK).json(apiResponse);
 };
 
 const deleteJob = async (req, res) => {
