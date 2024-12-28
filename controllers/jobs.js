@@ -61,7 +61,7 @@ const updateJob = async (req, res) => {
   const job = await Job.findById(req.params.id);
 
   if (!job) {
-    const operationResult = await OperationResult.Error(
+    const operationResult = await OperationResult.Failure(
       StatusCodes.NOT_FOUND,
       "Job not found"
     );
@@ -72,7 +72,7 @@ const updateJob = async (req, res) => {
   }
 
   if (job.createdBy !== req.user._id) {
-    const operationResult = await OperationResult.Error(
+    const operationResult = await OperationResult.Failure(
       StatusCodes.UNAUTHORIZED,
       "You are not authorized to update this job"
     );
@@ -104,7 +104,7 @@ const deleteJob = async (req, res) => {
   const job = await Job.findByIdAndDelete(req.params.id);
 
   if (!job) {
-    const operationResult = await OperationResult.Error(
+    const operationResult = await OperationResult.Failure(
       StatusCodes.NOT_FOUND,
       "Job not found"
     );
@@ -115,7 +115,7 @@ const deleteJob = async (req, res) => {
   }
 
   if (job.createdBy !== req.user._id) {
-    const operationResult = await OperationResult.Error(
+    const operationResult = await OperationResult.Failure(
       StatusCodes.UNAUTHORIZED,
       "You are not authorized to delete this job"
     );
