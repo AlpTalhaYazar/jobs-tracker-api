@@ -34,25 +34,24 @@ export class OperationResult {
 
 export class PaginatedOperationResult extends OperationResult {
   constructor() {
-    this.metaData = null;
+    this.paginationMetaData = null;
   }
 
   static async Success(data, metaData) {
     this.isSuccess = true;
     this.data = data;
-    this.metaData = metaData;
+    this.paginationMetaData = metaData;
     return this;
   }
 }
 
 export class PaginationMetaData {
-  constructor() {
+  constructor(page, pageSize, totalCount) {
     this.page = 1;
     this.pageSize = 10;
     this.totalCount = 0;
-    this.totalCount = 0;
-    this.totalPages = 0;
-    this.hasPrevious = this.page > 1;
-    this.hasNext = this.page < this.totalPages;
+    this.totalPages = Math.ceil(totalCount / pageSize);
+    this.hasPrevious = page > 1;
+    this.hasNext = page < this.totalPages;
   }
 }

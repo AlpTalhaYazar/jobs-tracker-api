@@ -36,18 +36,8 @@ export class ErrorDetails {
 
 export class PaginatedApiResponse extends ApiResponse {
   constructor() {
-    this.metaData = new PaginationMetaData();
-  }
-}
-
-export class PaginationMetaData {
-  constructor() {
-    this.page = 1;
-    this.pageSize = 10;
-    this.totalCount = 0;
-    this.totalPages = 0;
-    this.hasPrevious = this.page > 1;
-    this.hasNext = this.page < this.totalPages;
+    super();
+    this.paginationMetaData = new PaginationMetaData();
   }
 
   static async ToApiResponse(paginatedOperationResult, message = "") {
@@ -55,7 +45,11 @@ export class PaginationMetaData {
       const apiResponse = new PaginatedApiResponse();
       apiResponse.success = true;
       apiResponse.data = paginatedOperationResult.data;
-      apiResponse.metaData = paginatedOperationResult.metaData;
+      apiResponse.paginationMetaData = new PaginationMetaData(
+        paginatedOperationResult.paginationMetaData.page,
+        paginatedOperationResult.paginationMetaData.pageSize,
+        paginatedOperationResult.paginationMetaData.totalCount
+      );
       return apiResponse;
     }
 
@@ -66,5 +60,16 @@ export class PaginationMetaData {
     apiResponse.error.message = paginatedOperationResult.errorMessage;
     apiResponse.error.details = paginatedOperationResult.errorDetails;
     return apiResponse;
+  }
+}
+
+export class PaginationMetaData {
+  constructor(page, pageSize, totalCount) {
+    this.page = page;
+    this.pageSize = pageSize;
+    this.totalCount = totalCount;
+    this.totalPages = Math.ceil(totalCount / pageSize);
+    this.hasPrevious = page > 1;
+    this.hasNext = page < this.totalPages;
   }
 }

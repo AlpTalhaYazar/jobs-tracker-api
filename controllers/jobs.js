@@ -1,15 +1,49 @@
 import { StatusCodes } from "http-status-codes";
 import { Job } from "../models/Job.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiResponse, PaginatedApiResponse } from "../utils/ApiResponse.js";
 import { JobCreateDto, JobUpdateDto } from "../dto/job.dto.js";
-import { OperationResult } from "../utils/OperationResult.js";
+import {
+  OperationResult,
+  PaginatedOperationResult,
+  PaginationMetaData,
+} from "../utils/OperationResult.js";
 
 const getAllJobs = async (req, res) => {
-  const jobs = await Job.find();
+  var page = parseInt(req.query.page) || 1;
+  var pageSize = parseInt(req.query.pageSize) || 10;
+  var skip = (page - 1) * pageSize;
+  var limit = pageSize;
 
-  const operationResult = await OperationResult.Success(jobs);
+  const results = await Job.aggregate([
+    {
+      $facet: {
+        jobs: [
+          { $sort: { createdAt: -1 } },
+          { $skip: skip },
+          { $limit: limit },
+        ],
+        total: [{ $count: "count" }],
+      },
+    },
+    {
+      $project: {
+        jobs: 1,
+        total: { $arrayElemAt: ["$total.count", 0] },
+      },
+    },
+  ]);
 
-  const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+  const jobs = results[0].jobs;
+  const total = results[0].total;
+
+  const paginatedOperationResult = await PaginatedOperationResult.Success(
+    jobs,
+    new PaginationMetaData(page, pageSize, total)
+  );
+
+  const apiResponse = await PaginatedApiResponse.ToApiResponse(
+    paginatedOperationResult
+  );
 
   res.status(StatusCodes.OK).json(apiResponse);
 };
