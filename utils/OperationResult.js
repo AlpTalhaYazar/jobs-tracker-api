@@ -47,9 +47,9 @@ export class PaginatedOperationResult extends OperationResult {
 
 export class PaginationMetaData {
   constructor(page, pageSize, totalCount) {
-    this.page = 1;
-    this.pageSize = 10;
-    this.totalCount = 0;
+    this.page = page;
+    this.pageSize = pageSize;
+    this.totalCount = totalCount;
     this.totalPages = Math.ceil(totalCount / pageSize);
     this.hasPrevious = page > 1;
     this.hasNext = page < this.totalPages;
