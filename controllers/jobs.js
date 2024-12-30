@@ -7,6 +7,7 @@ import {
   PaginatedOperationResult,
   PaginationMetaData,
 } from "../utils/OperationResult.js";
+import { ErrorCode } from "../utils/ErrorCode.js";
 
 const getAllJobs = async (req, res) => {
   var page = parseInt(req.query.page) || 1;
@@ -96,7 +97,7 @@ const updateJob = async (req, res) => {
 
   if (!job) {
     const operationResult = await OperationResult.Failure(
-      StatusCodes.NOT_FOUND,
+      ErrorCode.EntityNotFound,
       "Job not found"
     );
 
@@ -107,7 +108,7 @@ const updateJob = async (req, res) => {
 
   if (job.createdBy !== req.user._id) {
     const operationResult = await OperationResult.Failure(
-      StatusCodes.UNAUTHORIZED,
+      ErrorCode.Unauthorized,
       "You are not authorized to update this job"
     );
 
@@ -139,7 +140,7 @@ const deleteJob = async (req, res) => {
 
   if (!job) {
     const operationResult = await OperationResult.Failure(
-      StatusCodes.NOT_FOUND,
+      ErrorCode.EntityNotFound,
       "Job not found"
     );
 
@@ -150,7 +151,7 @@ const deleteJob = async (req, res) => {
 
   if (job.createdBy !== req.user._id) {
     const operationResult = await OperationResult.Failure(
-      StatusCodes.UNAUTHORIZED,
+      ErrorCode.Unauthorized,
       "You are not authorized to delete this job"
     );
 
