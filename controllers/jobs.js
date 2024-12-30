@@ -8,6 +8,7 @@ import {
   PaginationMetaData,
 } from "../utils/OperationResult.js";
 import { ErrorCode } from "../utils/ErrorCode.js";
+import { NotFoundError } from "../errors/not-found.js";
 
 const getAllJobs = async (req, res) => {
   var page = parseInt(req.query.page) || 1;
@@ -63,14 +64,7 @@ const getJobById = async (req, res) => {
   const job = await Job.findById(req.params.id);
 
   if (!job) {
-    const operationResult = await OperationResult.Failure(
-      ErrorCode.EntityNotFound,
-      "Job not found"
-    );
-
-    const apiResponse = await ApiResponse.ToApiResponse(operationResult);
-
-    res.status(StatusCodes.NOT_FOUND).json(apiResponse);
+    throw new NotFoundError("Job not found");
   }
 
   const operationResult = await OperationResult.Success(job);
