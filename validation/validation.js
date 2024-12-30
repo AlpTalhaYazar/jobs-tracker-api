@@ -1,4 +1,3 @@
-import { StatusCodes } from "http-status-codes";
 import { validationResult } from "express-validator";
 import { ValidationError } from "../errors/index.js";
 
@@ -11,7 +10,10 @@ const validate = (schemas) => {
       return next();
     }
 
-    const validationError = new ValidationError("Validation failed", result.array());
+    const validationError = new ValidationError(
+      "Validation failed",
+      result.array()
+    );
     throw validationError;
   };
 };

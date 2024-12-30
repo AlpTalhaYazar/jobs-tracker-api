@@ -1,4 +1,6 @@
 import express from "express";
+import { validate } from "../validation/validation.js";
+import { jobCreateDtoSchema } from "../validation/job/validationSchemas.js";
 import {
   getAllJobs,
   getMyJobs,
@@ -10,7 +12,7 @@ import {
 
 const router = express.Router();
 
-router.route("/").get(getAllJobs).post(createJob);
+router.route("/").get(getAllJobs).post(validate(jobCreateDtoSchema), createJob);
 router.route("/my-jobs").get(getMyJobs);
 router.route("/:id").get(getJobById).patch(updateJob).delete(deleteJob);
 
