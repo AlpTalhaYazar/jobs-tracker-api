@@ -62,6 +62,17 @@ const getMyJobs = async (req, res) => {
 const getJobById = async (req, res) => {
   const job = await Job.findById(req.params.id);
 
+  if (!job) {
+    const operationResult = await OperationResult.Failure(
+      ErrorCode.EntityNotFound,
+      "Job not found"
+    );
+
+    const apiResponse = await ApiResponse.ToApiResponse(operationResult);
+
+    res.status(StatusCodes.NOT_FOUND).json(apiResponse);
+  }
+
   const operationResult = await OperationResult.Success(job);
 
   const apiResponse = await ApiResponse.ToApiResponse(operationResult);
