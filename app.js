@@ -1,16 +1,39 @@
 import "dotenv/config";
 import "express-async-errors";
+import xss from "xss-clean";
+import cors from "cors";
+import helmet from "helmet";
 import express from "express";
+import rateLimiter from "express-rate-limit";
+
 import { connectDB } from "./db/connect.js";
-import { authRoutes } from "./routes/auth.js";
 import { jobRoutes } from "./routes/jobs.js";
+import { ErrorCode } from "./utils/ErrorCode.js";
+import { authRoutes } from "./routes/auth.js";
+import { ApiResponse } from "./utils/ApiResponse.js";
+import { OperationResult } from "./utils/OperationResult.js";
 import { notFoundMiddleware } from "./middleware/not-found.js";
 import { errorHandlerMiddleware } from "./middleware/error-handler.js";
 import { authenticationMiddleware } from "./middleware/authentication.js";
 
 const app = express();
 
+app.use(
+  rateLimiter({
+    windowMs: 60 * 1000,
+    max: 1,
+    message: await ApiResponse.ToApiResponse(
+      await OperationResult.Failure(
+        ErrorCode.ServiceUnavailable,
+        "Too many requests"
+      )
+    ),
+  })
+);
 app.use(express.json());
+app.use(helmet());
+app.use(cors());
+app.use(xss());
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/jobs", authenticationMiddleware, jobRoutes);
