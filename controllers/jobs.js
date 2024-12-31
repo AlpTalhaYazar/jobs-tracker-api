@@ -16,27 +16,14 @@ const getAllJobs = async (req, res) => {
   var skip = (page - 1) * pageSize;
   var limit = pageSize;
 
-  const results = await Job.aggregate([
-    {
-      $facet: {
-        jobs: [
-          { $sort: { createdAt: -1 } },
-          { $skip: skip },
-          { $limit: limit },
-        ],
-        total: [{ $count: "count" }],
-      },
-    },
-    {
-      $project: {
-        jobs: 1,
-        total: { $arrayElemAt: ["$total.count", 0] },
-      },
-    },
+  const [jobs, total] = await Promise.all([
+    Job.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean().exec(),
+    Job.countDocuments()
   ]);
-
-  const jobs = results[0].jobs;
-  const total = results[0].total;
 
   const paginatedOperationResult = await PaginatedOperationResult.Success(
     jobs,

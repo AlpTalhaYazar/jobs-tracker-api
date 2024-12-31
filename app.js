@@ -21,7 +21,7 @@ const app = express();
 app.use(
   rateLimiter({
     windowMs: 60 * 1000,
-    max: 1,
+    max: 10,
     message: await ApiResponse.ToApiResponse(
       await OperationResult.Failure(
         ErrorCode.ServiceUnavailable,
@@ -32,7 +32,6 @@ app.use(
 );
 app.use(express.json());
 app.use(helmet());
-app.use(cors());
 app.use(xss());
 
 app.use("/api/v1/auth", authRoutes);
